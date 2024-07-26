@@ -1,9 +1,5 @@
-// examples in these files are from wpilib please read the everything regarding this project if you want to succeed!
-// command composition is used extensivly here in robotcontainer or anywhere we are building long strings of differetn commands for different subsystems. 
-// command composition -> https://docs.wpilib.org/en/stable/docs/software/commandbased/command-compositions.html
-// binding triggers is stuff like .ontrue(),.onfalse(),.negate(), .and(), these are used to fire a command when trigger is true. (button is pressed)
-// binding triggers (buttons) -> https://docs.wpilib.org/en/stable/docs/software/commandbased/binding-commands-to-triggers.html
-// for some advanced knowledge on what is actually scheduling and running the commands we make. read this -> https://docs.wpilib.org/en/stable/docs/software/commandbased/command-scheduler.html
+//lesson 4 we are moving everything outof robot container and into their own command building factories or subclasses. 
+
 
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
@@ -18,12 +14,14 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WrapperCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.cmdPrintToRioLog;
+import frc.robot.commands.cmd_SequenceOfCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.ComplexMechanismCommandFactory;
 import frc.robot.subsystems.MyFirstSubsystem;
 
 public class RobotContainer {
@@ -31,9 +29,13 @@ public class RobotContainer {
   private double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
   private boolean boolTriggersWhenTrue = false;
   /* Setting up bindings for necessary control of the swerve drive platform */
+  // The following classes are part of the main mechanism logic factory. every subsystem needs to be added to the factory via dependency injection.
   private final CommandXboxController joystick = new CommandXboxController(0); // My joystick
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
-
+  public final MyFirstSubsystem mFSS = new MyFirstSubsystem();
+  // this is the factory that take all the subsystems and ties them together
+  // this is where our operations will be constructed and some logic for each operation
+  public final frc.robot.subsystems.ComplexMechanismCommandFactory cmdFactory; 
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -47,25 +49,22 @@ public class RobotContainer {
   
   //THIS is our constructor method when our robot container is created/instantiated! it runs once.
   public RobotContainer() {
+    cmdFactory = new ComplexMechanismCommandFactory(joystick,drivetrain,mFSS);
     configureBindings();
   }
+
 
   private void configureBindings() {
     //////////////////////////////////////Drivetrain setup///////////////////////////////////////////////////////////
     //the default command is the command that will run when nothing else is scheduled for that subsytem.
-    drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
-        drivetrain.applyRequest(() -> drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with
-                                                                                           // negative Y (forward)
-            .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-            .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
-        ).ignoringDisable(true));
+    drivetrain.setDefaultCommand(defaultDriveCommand()); // Drivetrain will execute this command periodically
     //////////////////////////////////////////Drivetrain setup///////////////////////////////////////////////////////
     //////////////////////////////////////////All Other Button setup///////////////////////////////////////////////////////
     
     //bind the a button to a runnable action while true (while is checked every iteration for trueness)
     //The command that is ran "while true" is instant, therefor it will run once and stop. 
     //BUT the output should run while held, and stop when not so we add a repeatedly decorator to the runnable command to keep it repeating until cancelled. 
-    joystick.a().whileTrue(new cmdPrintToRioLog("button A While True").repeatedly());
+    joystick.a().whileTrue(new cmd_SequenceOfCommands().repeatedly());
     
     //binding the onfalse trigger can be done SEPERATE like the follwing line. or done together (inline) like the rest of the examples
     joystick.a().onFalse(Commands.runOnce(()->{System.out.println("button A now false");}));
@@ -73,31 +72,15 @@ public class RobotContainer {
     //this will bind the B button a series of sequential (in order 1 by 1) commands. Notice it runs once, its a sequential command group without any decorator telling it to repeat
     //see how we can insert any code we want into the instant command? we are just wrapping our code with something the scheduler can run!
     //When testing. notice how holding the button only runs the command once EVEN THOUGH its a while true. 
-    joystick.b().whileTrue(
-      new InstantCommand(()->{System.out.println("B button on true");})
-    .andThen(new cmdPrintToRioLog("button B While True 2"))
-    .andThen(Commands.runOnce(()->{System.out.println("button A now false");}))
-    ); 
+    joystick.b().whileTrue( cmdFactory.sequenceOfPrints()); 
 
     //The X button will LOOK like it operates in a manner that May seem like the B button, but will have more timing control.
     //notice how ontrue is a fire and forget. with whiletrue we had to hold the trigger on or it would cancel the entire command composition
-        joystick.x().onTrue(
-            Commands.sequence(
-              new cmdPrintToRioLog("button B While True 1"),//notice the LACK OF an extra parameter for timeout!  
-              new cmdPrintToRioLog("button B While True 2",.2),//notice the number for timeouts! its using a different constructor!
-              new cmdPrintToRioLog("button B While True 3",.3),
-              new cmdPrintToRioLog("button B While True 4",.001),
-              new cmdPrintToRioLog("button B While True 5",.5),
-              new cmdPrintToRioLog("button B While True 6",.6)
-            )
-          )
+        joystick.x().onTrue(cmdFactory.sequenceWithTimeouts())
           .onFalse(Commands.runOnce(()->{System.out.println("button x on false");}));
 
     //y button runs until you press the left trigger! look at the until decorator in the composition!
-    joystick.y().onTrue(
-      Commands.run(()->{System.out.println("button Y onTrue Run until press of left Trigger!!");})
-      .until(()->joystick.leftTrigger().getAsBoolean())
-    );
+    joystick.y().onTrue(cmdFactory.printUntilTrigger());
 
     // The right bumper on true is normal, so is the print statement, BUT LOOK we have a .debounce of 1 (second) next to the TRIGGER THAT WE WANT TO DEBOUNCE!. 
     // go ahead and try to press this button quickly. This debounce is called the falling edge debounce. 
@@ -129,21 +112,7 @@ public class RobotContainer {
     // THIS BUTTON REQUIRES 2 BUTTONS TO USE!!! READ CAREFULLY AND INTERPRET!
     // also notice the use of alongwith Inside an andthen()! you can sequence groups of parallel commands! 
     // joystick pov 90 (right)
-    joystick.povRight().and(joystick.rightStick())
-    .onTrue(
-      new cmdPrintToRioLog("pressing right POV and Right stick button together! sequence soon!")
-      .alongWith(new WaitCommand(1))
-        .andThen(new cmdPrintToRioLog("Sequence that fires after the 1 second - 1 "),
-        new cmdPrintToRioLog("Sequence that fires after the 1 second - 2 "),
-        new cmdPrintToRioLog("Sequence that fires after the 1 second - 3 "),
-        new cmdPrintToRioLog("Sequence that fires after the 1 second - 4 ")
-          .alongWith(new cmdPrintToRioLog("Sequence that fires after the 1 second - 4 parallel! ")),
-        new cmdPrintToRioLog("Sequence that fires after the 1 second - 5 "),
-        new cmdPrintToRioLog("Sequence that fires after the 1 second - 6 "),
-        new WaitCommand(1)
-      )
-      .andThen(Commands.print("This fires after the sequence before it. its another andthen outside the last alongwith or andthen"))
-    );
+    joystick.povRight().and(joystick.rightStick()).onTrue(cmdFactory.sequenceWithparallel());
 
 
 
@@ -155,10 +124,18 @@ public class RobotContainer {
     Command jake = new InstantCommand(()->{System.out.print("POV Toggled on!");});
     joystick.pov(180).toggleOnTrue(jake);
 
-
-
     ////////////////////////////////other task during binding?/////////////////////////////////////////
     drivetrain.registerTelemetry(logger::telemeterize);
+  }
+
+
+
+  private WrapperCommand defaultDriveCommand() {
+    return drivetrain.applyRequest(() -> drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with
+                                                                                       // negative Y (forward)
+        .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+        .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+    ).ignoringDisable(true);
   }
 
 
