@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.constants;
+import frc.robot.Constants;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
@@ -48,7 +48,7 @@ public class Robot extends TimedRobot {
         boolean doRejectUpdate = false;
         if(useMegaTag2 == false)
         {
-          LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(constants.LimelightVision.LimelightName);
+          LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(Constants.LimelightVision.LimelightName);
           
           if(mt1.tagCount == 1 && mt1.rawFiducials.length == 1)
           {
@@ -83,7 +83,7 @@ public class Robot extends TimedRobot {
         {
           
 
-          LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(constants.LimelightVision.LimelightName);
+          LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(Constants.LimelightVision.LimelightName);
           if(Math.abs(rotationalvelocity) > maxrotationalVelocityForLLUpdate) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
           {
             doRejectUpdate = true;

@@ -14,8 +14,9 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 
 import frc.robot.generated.TunerConstants;
+import frc.robot.Telemetry;
 
-public class constants {
+public class Constants {
 
     public static final class CANivoreBus{
         public static final String kCANbusName = "8608ChassisCan";
@@ -43,7 +44,7 @@ public class constants {
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // I want field-centric
 
 
-           public static final  Telemetry logger = new Telemetry(MaxSpeed);       
+        public static final  Telemetry logger = new Telemetry(MaxSpeed);       
         }
     
 }

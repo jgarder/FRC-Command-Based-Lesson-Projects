@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WrapperCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.constants;
+import frc.robot.Constants;
 import frc.robot.commands.cmdPrintToRioLog;
 
 public class ComplexMechanismCommandFactory {
@@ -28,10 +28,10 @@ public class ComplexMechanismCommandFactory {
     /////////////////DRIVETRAIN PARTS ////////////////////////
     //this is used by the drivetrain and should maybe be moved to a place that makes more sense?
     public WrapperCommand defaultDriveCommand() {
-        return drivetrain.applyRequest(() -> constants.drivetrain.drive.withVelocityX(-joystick.getLeftY() * constants.drivetrain.MaxSpeed) // Drive forward with
+        return drivetrain.applyRequest(() -> Constants.drivetrain.drive.withVelocityX(-joystick.getLeftY() * Constants.drivetrain.MaxSpeed) // Drive forward with
                                                                                         // negative Y (forward)
-            .withVelocityY(-joystick.getLeftX() * constants.drivetrain.MaxSpeed) // Drive left with negative X (left)
-            .withRotationalRate(-joystick.getRightX() * constants.drivetrain.MaxAngularRate) // Drive counterclockwise with negative X (left)
+            .withVelocityY(-joystick.getLeftX() * Constants.drivetrain.MaxSpeed) // Drive left with negative X (left)
+            .withRotationalRate(-joystick.getRightX() * Constants.drivetrain.MaxAngularRate) // Drive counterclockwise with negative X (left)
         ).ignoringDisable(true);
     }
     ////////////////////////////////////////////////////////

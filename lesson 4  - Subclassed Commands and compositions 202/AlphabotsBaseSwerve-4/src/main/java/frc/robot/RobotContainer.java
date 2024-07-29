@@ -59,7 +59,7 @@ public class RobotContainer {
   public RobotContainer() {
     cmdFactory = new ComplexMechanismCommandFactory(joystick,drivetrain,mFSS);
     configureBindings();
-    drivetrain.registerTelemetry(constants.drivetrain.logger::telemeterize);
+    drivetrain.registerTelemetry(Constants.drivetrain.logger::telemeterize);
   }
 
 

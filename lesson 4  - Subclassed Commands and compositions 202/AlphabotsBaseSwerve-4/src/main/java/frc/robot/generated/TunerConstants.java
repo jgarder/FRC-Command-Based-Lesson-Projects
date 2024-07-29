@@ -1,5 +1,5 @@
 package frc.robot.generated;
-import frc.robot.constants;
+import frc.robot.Constants;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -79,8 +79,8 @@ public class TunerConstants {
     private static final boolean kInvertRightSide = true;
 
 
-    private static final String kCANbusName = constants.CANivoreBus.kCANbusName;
-    private static final int kPigeonId = constants.CANivoreBus.kPigeonCanId;
+    private static final String kCANbusName = Constants.CANivoreBus.kCANbusName;
+    private static final int kPigeonId = Constants.CANivoreBus.kPigeonCanId;
 
 
     // These are only used for simulation
