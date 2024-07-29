@@ -76,7 +76,7 @@ public class RobotContainer {
     joystick.b().whileTrue(
       new InstantCommand(()->{System.out.println("B button on true");})
     .andThen(new cmdPrintToRioLog("button B While True 2"))
-    .andThen(Commands.runOnce(()->{System.out.println("button A now false");}))
+    .andThen(Commands.runOnce(()->{System.out.println("button b true 3");}))
     ); 
 
     //The X button will LOOK like it operates in a manner that May seem like the B button, but will have more timing control.

@@ -1,4 +1,16 @@
 //lesson 4 we are moving everything outof robot container and into their own command building factories or subclasses. 
+// Lesson 4 - subclassing commands and subclassing composition and perhaps a simple command factory ALSO subclassing constants!
+
+// This lesson we will take lesson 3 and spend most of the effort just moving all codes to subclasses and a command factory outside of robotcontainer. 
+
+
+// we will mainly be using the WPILib code compositon! please read all this and become a pro -> https://docs.wpilib.org/en/stable/docs/software/commandbased/command-compositions.html#subclassing-compositions
+// this guide is just a rewriting of the 100% awesome WPILIB docs! please just read the "Organizing command based programming" section and you wont even need a mentor! 
+
+// the implied 8608 resource is this lesson 4 lesson plan -> N/A yet! coming soon!
+// if you have no mentor read the wpilib here and replicate this source code on your own! 
+//-> https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html
+
 
 
 // Copyright (c) FIRST and other WPILib contributors.
@@ -25,8 +37,7 @@ import frc.robot.subsystems.ComplexMechanismCommandFactory;
 import frc.robot.subsystems.MyFirstSubsystem;
 
 public class RobotContainer {
-  private double MaxSpeed = TunerConstants.kSpeedAt12VoltsMps; // kSpeedAt12VoltsMps desired top speed
-  private double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
+  
   private boolean boolTriggersWhenTrue = false;
   /* Setting up bindings for necessary control of the swerve drive platform */
   // The following classes are part of the main mechanism logic factory. every subsystem needs to be added to the factory via dependency injection.
@@ -35,29 +46,27 @@ public class RobotContainer {
   public final MyFirstSubsystem mFSS = new MyFirstSubsystem();
   // this is the factory that take all the subsystems and ties them together
   // this is where our operations will be constructed and some logic for each operation
-  public final frc.robot.subsystems.ComplexMechanismCommandFactory cmdFactory; 
+  public final frc.robot.subsystems.ComplexMechanismCommandFactory cmdFactory; //NOTICE THAT WE ARENT INSTANTIATING THIS OBJECT HERE! this is choice at this time but could be for a more important reason 
 
-  private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-      .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
-      .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // I want field-centric
-                                                               // driving in open loop
+ 
 
   /* Path follower */
   private Command runAuto = drivetrain.getAutoPath("Tests");
 
-  private final Telemetry logger = new Telemetry(MaxSpeed);
+  
   
   //THIS is our constructor method when our robot container is created/instantiated! it runs once.
   public RobotContainer() {
     cmdFactory = new ComplexMechanismCommandFactory(joystick,drivetrain,mFSS);
     configureBindings();
+    drivetrain.registerTelemetry(constants.drivetrain.logger::telemeterize);
   }
 
 
   private void configureBindings() {
     //////////////////////////////////////Drivetrain setup///////////////////////////////////////////////////////////
     //the default command is the command that will run when nothing else is scheduled for that subsytem.
-    drivetrain.setDefaultCommand(defaultDriveCommand()); // Drivetrain will execute this command periodically
+    drivetrain.setDefaultCommand(cmdFactory.defaultDriveCommand()); // Drivetrain will execute this command periodically
     //////////////////////////////////////////Drivetrain setup///////////////////////////////////////////////////////
     //////////////////////////////////////////All Other Button setup///////////////////////////////////////////////////////
     
@@ -122,21 +131,11 @@ public class RobotContainer {
     // im leaving this, if i learn i will have a place to update!
     // smart students read this and fix my mistakes -> https://docs.wpilib.org/en/stable/docs/software/commandbased/binding-commands-to-triggers.html
     Command jake = new InstantCommand(()->{System.out.print("POV Toggled on!");});
-    joystick.pov(180).toggleOnTrue(jake);
-
-    ////////////////////////////////other task during binding?/////////////////////////////////////////
-    drivetrain.registerTelemetry(logger::telemeterize);
+    joystick.pov(180).toggleOnTrue(jake);    
   }
 
 
 
-  private WrapperCommand defaultDriveCommand() {
-    return drivetrain.applyRequest(() -> drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with
-                                                                                       // negative Y (forward)
-        .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-        .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
-    ).ignoringDisable(true);
-  }
 
 
 

@@ -6,7 +6,9 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WrapperCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.constants;
 import frc.robot.commands.cmdPrintToRioLog;
 
 public class ComplexMechanismCommandFactory {
@@ -16,49 +18,61 @@ public class ComplexMechanismCommandFactory {
     CommandSwerveDrivetrain drivetrain; 
     MyFirstSubsystem mFSS;
 
+    //this is called complex but its a misnomer, its really just needs to be complex enough need its own class like this
     public ComplexMechanismCommandFactory(CommandXboxController joystick,CommandSwerveDrivetrain drivetrain, MyFirstSubsystem mFSS) {
         this.joystick = joystick;
         this.drivetrain = drivetrain;
         this.mFSS = mFSS;
     }
 
-      public SequentialCommandGroup sequenceOfPrints() {
-            return new InstantCommand(()->{System.out.println("B button on true");})
-                .andThen(new cmdPrintToRioLog("button B While True 2"))
-                .andThen(Commands.runOnce(()->{System.out.println("button A now false");}));
-        }
+    /////////////////DRIVETRAIN PARTS ////////////////////////
+    //this is used by the drivetrain and should maybe be moved to a place that makes more sense?
+    public WrapperCommand defaultDriveCommand() {
+        return drivetrain.applyRequest(() -> constants.drivetrain.drive.withVelocityX(-joystick.getLeftY() * constants.drivetrain.MaxSpeed) // Drive forward with
+                                                                                        // negative Y (forward)
+            .withVelocityY(-joystick.getLeftX() * constants.drivetrain.MaxSpeed) // Drive left with negative X (left)
+            .withRotationalRate(-joystick.getRightX() * constants.drivetrain.MaxAngularRate) // Drive counterclockwise with negative X (left)
+        ).ignoringDisable(true);
+    }
+    ////////////////////////////////////////////////////////
 
-          public SequentialCommandGroup sequenceWithparallel() {
-    return new cmdPrintToRioLog("pressing right POV and Right stick button together! sequence soon!")
-    .alongWith(new WaitCommand(1))
-      .andThen(new cmdPrintToRioLog("Sequence that fires after the 1 second - 1 "),
-      new cmdPrintToRioLog("Sequence that fires after the 1 second - 2 "),
-      new cmdPrintToRioLog("Sequence that fires after the 1 second - 3 "),
-      new cmdPrintToRioLog("Sequence that fires after the 1 second - 4 ")
-        .alongWith(new cmdPrintToRioLog("Sequence that fires after the 1 second - 4 parallel! ")),
-      new cmdPrintToRioLog("Sequence that fires after the 1 second - 5 "),
-      new cmdPrintToRioLog("Sequence that fires after the 1 second - 6 "),
-      new WaitCommand(1)
-    )
-    .andThen(Commands.print("This fires after the sequence before it. its another andthen outside the last alongwith or andthen"));
-  }
+    public SequentialCommandGroup sequenceOfPrints() {
+        return new InstantCommand(()->{System.out.println("B button on true");})
+            .andThen(new cmdPrintToRioLog("button B While True 2"))
+            .andThen(Commands.runOnce(()->{System.out.println("button b true 3");}));
+    }
+
+    public SequentialCommandGroup sequenceWithparallel() {
+        return new cmdPrintToRioLog("pressing right POV and Right stick button together! sequence soon!")
+            .alongWith(new WaitCommand(1))
+                .andThen(new cmdPrintToRioLog("Sequence that fires after the 1 second - 1 "),
+                new cmdPrintToRioLog("Sequence that fires after the 1 second - 2 "),
+                new cmdPrintToRioLog("Sequence that fires after the 1 second - 3 "),
+                new cmdPrintToRioLog("Sequence that fires after the 1 second - 4 ")
+                    .alongWith(new cmdPrintToRioLog("Sequence that fires after the 1 second - 4 parallel! ")),
+                new cmdPrintToRioLog("Sequence that fires after the 1 second - 5 "),
+                new cmdPrintToRioLog("Sequence that fires after the 1 second - 6 "),
+                new WaitCommand(1)
+                    )
+                    .andThen(Commands.print("This fires after the sequence before it. its another andthen outside the last alongwith or andthen"));
+    }
 
 
-  public ParallelRaceGroup printUntilTrigger() {
-    return Commands.run(()->{System.out.println("button Y onTrue Run until press of left Trigger!!");})
-    .until(()->joystick.leftTrigger().getAsBoolean());
-  }
+    public ParallelRaceGroup printUntilTrigger() {
+        return Commands.run(()->{System.out.println("button Y onTrue Run until press of left Trigger!!");})
+            .until(()->joystick.leftTrigger().getAsBoolean());
+    }
 
 
-  public Command sequenceWithTimeouts() {
-    return Commands.sequence(
-      new cmdPrintToRioLog("button B While True 1"),//notice the LACK OF an extra parameter for timeout!  
-      new cmdPrintToRioLog("button B While True 2",.2),//notice the number for timeouts! its using a different constructor!
-      new cmdPrintToRioLog("button B While True 3",.3),
-      new cmdPrintToRioLog("button B While True 4",.001),
-      new cmdPrintToRioLog("button B While True 5",.5),
-      new cmdPrintToRioLog("button B While True 6",.6)
-    );
-  }
+    public Command sequenceWithTimeouts() {
+        return Commands.sequence(
+        new cmdPrintToRioLog("button B While True 1"),//notice the LACK OF an extra parameter for timeout!  
+        new cmdPrintToRioLog("button B While True 2",.2),//notice the number for timeouts! its using a different constructor!
+        new cmdPrintToRioLog("button B While True 3",.3),
+        new cmdPrintToRioLog("button B While True 4",.001),
+        new cmdPrintToRioLog("button B While True 5",.5),
+        new cmdPrintToRioLog("button B While True 6",.6)
+        );
+    }
 
 }
