@@ -1,17 +1,3 @@
-//lesson 5? 
-//Dashboard information and sendable interactions. 
-//sendables only work in test most for the livewindow. its a hassle honestly. 
-
-// the implied 8608 resource is this lesson 5 lesson plan -> N/A yet! coming?
-// if you have no mentor read the wpilib here and replicate this source code on your own! 
-//-> https://docs.wpilib.org/en/stable/docs/software/dashboards/smartdashboard/displaying-status-of-commands-and-subsystems.html
-// - > https://docs.wpilib.org/en/stable/docs/software/telemetry/writing-sendable-classes.html#writing-your-own-sendable-classes
-// - > https://docs.wpilib.org/en/stable/docs/software/wpilib-tools/robotbuilder/introduction/robotbuilder-testing-with-shuffleboard.html
-//->https://docs.wpilib.org/en/stable/docs/software/telemetry/robot-telemetry-with-sendable.html
-
-
-
-
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
