@@ -31,7 +31,9 @@
  * Task 2 (viewed by Mentor): make the B "joystick.b().whileTrue" also print the text "button b true 3"
  *  -> System.out.println(); is the code you need to run, its not a command, its needs to be wrapped in an instant command or a "runonce"
  * 
- *   
+ * at any time you can also check the github branch "lessonSolutions" to see how the mentors intend you to pass the task, though there are MANY 
+ * way to achieve each problem.  but the best option is to look at the WPIlib resources linked above and read about the topic at hand.
+ *  
  * Sticking commands together can do incredibly complex things. 
  * if you have made it this far and can take apart and rebuild the commands below. you can program a robot. you are. you already have. 
 */

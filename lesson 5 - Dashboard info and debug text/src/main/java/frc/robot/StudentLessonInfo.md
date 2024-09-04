@@ -27,4 +27,7 @@
  * 
  * Task 1 (viewed by Mentor):  
  *   
+ * at any time you can also check the github branch "lessonSolutions" to see how the mentors intend you to pass the task, though there are MANY 
+ * way to achieve each problem.  but the best option is to look at the WPIlib resources linked above and read about the topic at hand.
+ * 
  */

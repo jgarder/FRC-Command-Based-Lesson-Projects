@@ -32,8 +32,9 @@
  *  in our case our trigger is going to come from our controller on port 0 that we call m_driverController. 
  *  if we stop pressing the "A" button the trigger for "while false" that would become true would be  "m_driverController.a().Whilefalse(COMMANDS TO RUN GO HERE)"
  *   
- *  you can view the solutions folder if you give up, but the best option is to look at the WPIlib resources above 
- *    and look for WhileTrue and drop the examplemethodcommand into the arguments/parameters 
+ * at any time you can also check the github branch "lessonSolutions" to see how the mentors intend you to pass the task, though there are MANY 
+ * way to achieve each problem.  but the best option is to look at the WPIlib resources linked above and read about the topic at hand.
+ * 
  *   
  * 
  * This is just a "skeleton", or "boilerplate" of a robots code. its all the stuff that every robot team has to have. 

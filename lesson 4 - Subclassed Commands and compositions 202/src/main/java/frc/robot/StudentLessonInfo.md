@@ -31,4 +31,7 @@ import java.lang.invoke.ClassSpecializer.Factory;
  *  -> make the method or function in "ComplexMechanismCommandFactory.java" return a command so we can schedule it in our command scheduler
  *  -> run cmdFactory.sequenceOfPrints() is the result. convert the joystick.b trigger below to Just run sequence of prints method. 
  *   
+ * at any time you can also check the github branch "lessonSolutions" to see how the mentors intend you to pass the task, though there are MANY 
+ * way to achieve each problem.  but the best option is to look at the WPIlib resources linked above and read about the topic at hand.
+ * 
  */

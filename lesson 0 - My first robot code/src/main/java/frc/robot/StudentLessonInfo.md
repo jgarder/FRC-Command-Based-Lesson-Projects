@@ -27,5 +27,8 @@
  * Task 2 (viewed by Mentor): Add a print out that will say "running during periodic" when teleop is enabled. and not print when disabled.
  *  - YOU SHOULD BE ABLE TO VIEW THE OUTPUT IN THE TERMINAL IN VSCODE (with a real robot also in the driverstation)
  * 
+ * at any time you can also check the github branch "lessonSolutions" to see how the mentors intend you to pass the task, though there are MANY 
+ * way to achieve each problem.  but the best option is to look at the WPIlib resources linked above and read about the topic at hand.
+ * 
  * Goodluck, getting this setup is a giant hurdle. after this you can mess with things and just enjoy the enviroment, maybe expand your knowledge (if you want)
 */

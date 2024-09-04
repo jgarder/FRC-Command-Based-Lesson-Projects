@@ -35,8 +35,10 @@
  *  -> you will need to pass a parameter of true or false to this method! its expecting a boolean called setToThis
  *  -> Run the command of the subsystem named objectOfMyFirstClass.  use the method and argument/parameter cmd_setPrintPeriodic(false)
  * 
- *  you can view the solutions folder if you give up, but the best option is to look at the WPIlib resources above 
- *    and look at the topic at hand.
+ * at any time you can also check the github branch "lessonSolutions" to see how the mentors intend you to pass the task, though there are MANY 
+ * way to achieve each problem.  but the best option is to look at the WPIlib resources linked above and read about the topic at hand.
+ * 
+ * 
  *   
  * 
 */
