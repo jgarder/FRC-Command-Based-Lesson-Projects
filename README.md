@@ -8,9 +8,10 @@ As a sidenote many of our mentors (this writer included) and students have A.D.D
 read the quickstart laptop guide.rm for more but the process is : 
  1. Setup laptop with NI tools and Wpilib. this will give you the programmers VScode and the Driverstation we use in FRC
  2. Download Github Desktop and inside github desktop Clone the repository so that you have a local copy of everything!
-    2.0 (inside github desktop) you can CLONE the repository or just download the zip and link the repository to github
-    2.1 (inside github desktop press branch and "branch" the repository with your own changes! 
- 3. in wpilibs VsCode press file->open folder -> and clock on lesson 0 on the repository you just cloned from github!
+ 2. (On this main github page) Scroll to the top and press the big GREEN button named <> code, Then press "open in github desktop"
+ 2. (inside github desktop) you can CLONE the repository or just download the zip and link the repository to github
+ 2. (inside github desktop press branch and "branch" the repository with your own changes! 
+ 5. in wpilibs VsCode press file->open folder -> and clock on lesson 0 on the repository you just cloned from github!
  4. (in vscode) on the left press explorer (these are the files!) and goto src->frc->java and open StudentLessonInfo.md  
  5. open robot.java (lesson 0) or robotcontainer.java (command based) to start the lesson!
  6. Press F5 to start debugging or Press Simulate robot code to Simulate the robot code!
