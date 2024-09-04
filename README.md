@@ -9,13 +9,13 @@ read the quickstart laptop guide.rm for more but the process is :
  1. Setup laptop with NI tools and Wpilib. this will give you the programmers VScode and the Driverstation we use in FRC
  2. Download Github Desktop and inside github desktop Clone the repository so that you have a local copy of everything!
  2. (On this main github page) Scroll to the top and press the big GREEN button named <> code, Then press "open in github desktop"
- 2. (inside github desktop) you can CLONE the repository or just download the zip and link the repository to github
- 2. (inside github desktop press branch and "branch" the repository with your own changes! 
- 5. in wpilibs VsCode press file->open folder -> and clock on lesson 0 on the repository you just cloned from github!
+ 2. (IF you did not "open in github desktop") Then (inside github desktop) you can CLONE the repository or just download the zip and link the repository to github
+ 2. (inside github desktop) press branch and "new branch" and name your branch with your name or nickname (like Joe, bobbyFisher20, or NightRider) this will make a repository with your own changes that wont affect anyone else! 
+ 5. (in wpiLib VsCode) press file->open folder -> and click on the lesson 0 folder inside the repository you just cloned from github and hit OK!
  4. (in vscode) on the left press explorer (these are the files!) and goto src->frc->java and open StudentLessonInfo.md  
- 5. open robot.java (lesson 0) or robotcontainer.java (command based) to start the lesson!
+ 5. open robot.java (lesson 0) or robotcontainer.java (all other lessons) to start the lesson!
  6. Press F5 to start debugging or Press Simulate robot code to Simulate the robot code!
- 7. Show the mentor your results to pass! or update your branch
+ 7. Show the mentor your results to pass! or publish your branch to have your work on github! you're famous!
 
 ### struggling? more programming!
 maybe you could learn more about computer science and how java works as a programming language. 
