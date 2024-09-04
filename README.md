@@ -2,7 +2,7 @@
 
 ## To the parents and students: 
 this is hyper-accelerated course that is hyper-focused on FRC Java, you and your kid will feel lost at times. each question could be answered with a 4 year degree in Computer science or mathmatics. Do not be discouraged, questions to the mentor show them who is most passionate about their results! 
-As a sidenote many of our mentors (this writer included) and students have A.D.D or A.D.H.D and these lesson were wrote with that in mind. many things will be "bullet points" or just list of information so that it is not a "wall of text" that can be overwhelming to many affected students.
+As a sidenote many of our mentors (this writer included) and students have A.D.D or A.D.H.D and these lesson were wrote with that in mind. many things will be "bullet points" or just list of information so that it is not a "wall of text" that can be overwhelming to many affected students. this will mean you will have to "seek out" information by following links and resources given in each lesson info.
 
 ### How to use this? 
 read the quickstart laptop guide.rm for more but the process is : 
