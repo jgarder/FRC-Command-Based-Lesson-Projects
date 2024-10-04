@@ -1,7 +1,7 @@
  --->>>> Open Robot.java to begin working. <<<<<<<<<<-----
   
   ## FRC #8608 java FRC programming
-  #### lesson 003
+  #### lesson 004
   
   This guide is just a rewriting of the 100% awesome WPILIB docs! 
   please just read the zero to robot section and you wont even need a mentor! 
@@ -21,10 +21,12 @@
   
   ### Task to pass this lesson:
   
-  1. Look at ALL the comments (green text) in Robot.java and look for a commented out XboxController object. this object wont be created if its commented out. uncomment it now. If you Simulate your code did anything operate different before and after this change?  
+  1. Look at ALL the comments (green text) in Robot.java and look for a commented out print command object. this object wont be created if its commented out. uncomment it now. If you Simulate your code did anything operate different before and after this change?  
   
-  2. (viewed by Mentor): uncomment the  system.out.println() that will say "A button pressed" when teleop is enabled and the A button is pressed. Save and simulate again.
+  2. (viewed by Mentor): uncomment the bindings for the print command to the controller and will print "printing a statement from my first command!" when teleop is enabled and the A button is pressed OR the smartdashboard button is pressed. Save and simulate again.
     - YOU SHOULD BE ABLE TO VIEW THE OUTPUT IN THE TERMINAL IN VSCODE
+  
+  3. (viewed by Mentor): The print commands still arent working correctly! what are we missing? well did you know the command based framework that manages all commands and subsystems need the command scheduler to actually RUN each periodic loop? make sure that your command scheduler is running inside your periodic loop!
   
   - for lessons that require code changes there is a github branch "lessonSolutions" where you can find 1 possible way to pass pass the task, though there are MANY 
   way to approach each problem.  but the best option is to look at the WPIlib resources linked above and read about the topic at hand.

@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.XboxController;
  * directory.
  */
 public class Robot extends TimedRobot {
-
+  // This is our xbox controller object that we use around the program.
   //private final XboxController controller = new XboxController(0);
 
   public Robot() {
@@ -25,7 +25,7 @@ public class Robot extends TimedRobot {
   /** This function is run once each time the robot enters autonomous mode. */
   @Override
   public void autonomousInit() {
-    System.out.println("autonomousInit Running MatchTime :" + DriverStation.getMatchTime());
+    System.out.println("autonomousInit Running");
   }
   
     /** This periodic runs at all times peridocially. */

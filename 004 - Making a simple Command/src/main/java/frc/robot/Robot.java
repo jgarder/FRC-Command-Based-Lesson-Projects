@@ -6,8 +6,11 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.event.BooleanEvent;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -16,73 +19,56 @@ import edu.wpi.first.wpilibj.XboxController;
  * directory.
  */
 public class Robot extends TimedRobot {
-
-  private final XboxController m_controller = new XboxController(0);
-  private final Timer m_timer = new Timer();
-  public int periodicCounter = 1;
-
+  // This is our xbox controller object that we use around the program.
+  private final CommandXboxController controller = new CommandXboxController(0);
+  //private final PrintCommand myFirstCommand = new PrintCommand("printing a statement from my first command!");
   public Robot() {
-    m_timer.reset();
     System.out.println("Robot constructor method Running. the fields declared outside this have already constructed such as the timer. ");
-  }
 
-  /**
-   * This function is run when the robot is first started up and should be used for any
-   * initialization code.
-   */
-  @Override
-  public void robotInit() {
-    System.out.println("robotInit method Running (this is functionally same as the constructor you should use that)");
+    // notice that last project we checked the xbox controller every periodic loop to see if any button is pressed. 
+    // in the command based framework we declare triggers and bindings at the bootup of the robot (i.e this code only runs ONCE at startup)
+    // controller -> A button -> when it becomes true -> schedule my first command
+    //controller.a().onTrue(myFirstCommand);
 
+    //we can bind the same command to run under different triggers
+    //SmartDashboard.putData("My print CMD",myFirstCommand);
   }
 
   /** This function is run once each time the robot enters autonomous mode. */
   @Override
   public void autonomousInit() {
-    System.out.println("autonomousInit Running MatchTime :" + DriverStation.getMatchTime());
-    m_timer.restart();
+    System.out.println("autonomousInit Running");
   }
   
     /** This periodic runs at all times peridocially. */
   @Override
   public void robotPeriodic() {
-    periodicCounter++;
-    if (periodicCounter % 750.0 == 0) 
-    {
-      System.out.println("robotPeriodic has ran 750 more times MatchTime :" + DriverStation.getMatchTime());
-    }
+    // the robotPeriodic runs each periodic loop in any state (disabled,auton,teleop,test)
+    // the command scheduler must run each loop to run teh scheduled commands! without this piece of code the command based framework DOES NOT WORK!
+    //CommandScheduler.getInstance().run();
   }
   /** This periodic runs at all times while disabled peridocially. */
   @Override
   public void disabledPeriodic() {
-    if (periodicCounter % 500.0 == 0) 
-    {
-      System.out.println("disabledPeriodic has ran 500 more times MatchTime :" + DriverStation.getMatchTime());
-    }
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    // Drive for 2 seconds
-    if (m_timer.get() < 2.0) {
-      System.out.println("autonomousPeriodic Running MatchTime :" + DriverStation.getMatchTime());
-    } else {
-      System.out.println("autonomousPeriodic Running but greater than 2 seconds - MatchTime :" + DriverStation.getMatchTime());
-    }
   }
 
   /** This function is called once each time the robot enters teleoperated mode. */
   @Override
-  public void teleopInit() {System.out.println("teleopInit Running");}
+  public void teleopInit() {
+    //when teleop begins we like to freeze the robot and stop it from doing whatever it was doing. if this doesnt work for us then we can change it later.
+    CommandScheduler.getInstance().cancelAll(); 
+    System.out.println("teleopInit Running");
+  }
 
   /** This function is called periodically during teleoperated mode. */
   @Override
   public void teleopPeriodic() {
-    //you will need a function here that runs ever 20 milliseconds (one period of our periodic)
-    if (m_controller.getAButtonPressed()) {
-      System.out.println("A button pressed");
-    }
+    //nothing needs to run only during teleop in this project.
   }
 
   /** This function is called once each time the robot enters test mode. */
