@@ -13,7 +13,7 @@ public class Robot extends TimedRobot {
 
   //This method has the same name as the class it will always run when an object is instantiated into memory
   public Robot() {
-    System.out.println(" World.");
+    System.out.println(" World!");
   }
 
   

@@ -13,9 +13,9 @@
   3. The project will build, then 2 SMALL options at top middle of screen will appear. check sim Gui and press OK
     - view the terminal at the bottom of the VSCODE screen. The printouts you see here are is the system.out.println() that are executing.<br><br>
   
-4. (viewed by Mentor): find the method in the Main class that says "Hello " and find the method in the Robot class that prints "World" 
+4. (viewed by Mentor): find the method in the Main class that says "Hello !" and find the method in the Robot class that prints "World!" 
    - AFTER RESTARTING THE SIMULATION YOU SHOULD BE ABLE TO VIEW THE OUTPUT IN THE TERMINAL IN VSCODE, 
 
-5. (viewed by Mentor): find the "hello" and "world" text in the terminal. why is the hello where it is? why is World where it is?
+5. (viewed by Mentor): find the "hello!" and "world!" text in the terminal. why is the hello where it is? why is World where it is?
     - did you know, "Hello " is running before ANY robot code, its just regular ol' java at this point. 
     - "World" is run as the first line of your (the user) code. everything before it is Wpilib "TimedRobot" class and other libraries booting up. everything after is your robots "main loop" running over and over. 

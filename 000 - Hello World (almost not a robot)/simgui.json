@@ -4,19 +4,7 @@
       "/FMSInfo": "FMSInfo"
     }
   },
-  "NetworkTables": {
-    "transitory": {
-      "FMSInfo": {
-        "open": true
-      }
-    }
-  },
   "NetworkTables Info": {
-    "Server": {
-      "Subscribers": {
-        "open": true
-      }
-    },
     "visible": true
   }
 }
