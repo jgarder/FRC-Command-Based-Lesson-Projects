@@ -35,6 +35,9 @@
  * at any time you can also check the github branch "lessonSolutions" to see how the mentors intend you to pass the task, though there are MANY 
  * way to achieve each problem.  but the best option is to look at the WPIlib resources linked above and read about the topic at hand.
  * 
+ * TEST TASK -> This is your first test, so far we have uncommented stuff, but creating is where winners are made. you will be 
+ * working inside  a robot that already exist, so there will be lots of distracting text. construct a command based robot (just 
+ * printing text) that uses buttons and will "lift elevator" and "swing arm to score" using the X and Y Button.. 
  *   
  * 
  * This is just a "skeleton", or "boilerplate" of a robots code. its all the stuff that every robot team has to have. 

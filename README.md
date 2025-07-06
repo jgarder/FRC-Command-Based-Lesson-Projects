@@ -21,3 +21,4 @@
 
  006 - this is like 005, but with subsystems and the class subsystembase. in this example we will pretend to move a motor forward and back with out joystick axis, you should also read out the motor speed with your elastic dashboard! this is key to debugging! sidenote : notice how we add new objects to robotContainer near the top, to quickly assess the objects used in a file and how the object may work. we usually put methods and functions below the objects (fields and properties) 
 
+ 007 - This is your first test, so far we have uncommented stuff, but creating is where winners are made. you will be working inside  a robot that already exist, so there will be lots of distracting text. construct a command based robot (just printing text) that uses buttons and will "lift elevator" and "swing arm to score" using the X and Y Button.. 
