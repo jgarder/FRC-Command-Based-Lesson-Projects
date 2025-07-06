@@ -5,8 +5,11 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 /**
@@ -16,19 +19,29 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
  * directory.
  */
 public class Robot extends TimedRobot {
+  //Our new subsystem
+  //private final FakeMotorClass OurRobotsArmController = new FakeMotorClass();
   // This is our xbox controller object that we use around the program.
   private final CommandXboxController controller = new CommandXboxController(0);
-  //private final Command myFirstCommand = new ExampleCommand();
+
+  public final int testAxis = 1;
+  public final double joystickDeadZone = 0.03; //threshold of .03 is 3%
   public Robot() {
-    System.out.println("Robot constructor method Running. the fields declared outside this have already constructed such as the timer. ");
+    System.out.println("Robot constructor method 006 Running. the fields declared outside this have already constructed such as the timer. ");
 
-    // notice that last project we checked the xbox controller every periodic loop to see if any button is pressed. 
-    // in the command based framework we declare triggers and bindings at the bootup of the robot (i.e this code only runs ONCE at startup)
-    // controller -> A button -> when it becomes true -> schedule my first command
-    //controller.a().onTrue(myFirstCommand);
-
+    //method 1
+    //controller.axisMagnitudeGreaterThan(testAxis,joystickDeadZone) 
+    //.whileTrue(new InstantCommand(()->{OurRobotsArmController.MotorCustomSpeed(-controller.getRawAxis(testAxis));}).repeatedly());
+    
+    //method 2
+    //OurRobotsArmController.setDefaultCommand(
+      //Commands.run(()->{OurRobotsArmController.MotorCustomSpeed(-controller.getRawAxis(testAxis));},OurRobotsArmController)
+    //);
+    
     //we can bind the same command to run under different triggers
-    //SmartDashboard.putData("My print CMD",myFirstCommand);
+    //SmartDashboard.putData("Stop Motor",Commands.runOnce(()->{OurRobotsArmController.MotorStop();}, OurRobotsArmController));
+
+    SmartDashboard.putNumber("My Joystick movement",controller.getRawAxis(testAxis));
   }
 
   /** This function is run once each time the robot enters autonomous mode. */

@@ -21,10 +21,10 @@
   
   ### Task to pass this lesson:
   
-  1. Look at ALL the comments (green text) in Robot.java and look for a commented out print command object. this object wont be created if its commented out. uncomment it now. If you Simulate your code did anything operate different before and after this change?  Notice that you need the proper imports at the top the page? import those now try using quickfix or import frc.robot.commands.ExampleCommand;
+  1. Look at ALL the comments (green text) in RobotContainer.java we are implementing a mock subsystem that will pretend to move a motor. ;
   
-  2. (viewed by Mentor): uncomment the bindings for the print command to the controller and will run the "example command" from the commands folder when teleop is enabled and the A button is pressed OR the smartdashboard button is pressed. Save and simulate again. Notice that you need the proper imports at the top the page? import those now try using quickfix or import frc.robot.commands.ExampleCommand;
-    - YOU SHOULD BE ABLE TO VIEW THE OUTPUT IN THE TERMINAL IN VSCODE
+  2. (viewed by Mentor): uncomment the bindings for the method 1 or method 2  Save and simulate again. make sure to the axis data into your elastic dashboard so we can check everything is working and debug issues. you are now moving a motor or adjusting something! this is control!
+  3. (viewed by Mentor) advanced : Copy and paste the OurRobotsArmController and make another subsystem to pretend to control another motor, perhaps this would be a wrist or other joint on the arm! 2. Then copy the old controller commands and change the button and assign the commands to the new subsystem, you are now expanding and controlling multiple subsystems with just a few buttons!~
   
   
   - for lessons that require code changes there is a github branch "lessonSolutions" where you can find 1 possible way to pass pass the task, though there are MANY 

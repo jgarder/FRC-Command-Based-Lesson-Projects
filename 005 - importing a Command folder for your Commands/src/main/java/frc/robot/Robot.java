@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.SimpleExampleCommand;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -19,6 +20,7 @@ public class Robot extends TimedRobot {
   // This is our xbox controller object that we use around the program.
   private final CommandXboxController controller = new CommandXboxController(0);
   //private final Command myFirstCommand = new ExampleCommand();
+  private final Command mySecondCommand = new SimpleExampleCommand();
   public Robot() {
     System.out.println("Robot constructor method Running. the fields declared outside this have already constructed such as the timer. ");
 
@@ -26,7 +28,8 @@ public class Robot extends TimedRobot {
     // in the command based framework we declare triggers and bindings at the bootup of the robot (i.e this code only runs ONCE at startup)
     // controller -> A button -> when it becomes true -> schedule my first command
     //controller.a().onTrue(myFirstCommand);
-
+    controller.b().onTrue(mySecondCommand);
+ 
     //we can bind the same command to run under different triggers
     //SmartDashboard.putData("My print CMD",myFirstCommand);
   }

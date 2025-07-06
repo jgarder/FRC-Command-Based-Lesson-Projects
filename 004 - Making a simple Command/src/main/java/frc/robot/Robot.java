@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -21,7 +22,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 public class Robot extends TimedRobot {
   // This is our xbox controller object that we use around the program.
   private final CommandXboxController controller = new CommandXboxController(0);
-  //private final PrintCommand myFirstCommand = new PrintCommand("printing a statement from my first command!");
+  //private final Command myFirstCommand = new PrintCommand("printing a statement from my first command!").withName("My First Command!");
   public Robot() {
     System.out.println("Robot constructor method Running. the fields declared outside this have already constructed such as the timer. ");
 
