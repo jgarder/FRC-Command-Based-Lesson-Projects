@@ -28,12 +28,8 @@ public class ComplexMechanismCommandFactory {
 
     /////////////////DRIVETRAIN PARTS ////////////////////////
     //this is used by the drivetrain and should maybe be moved to a place that makes more sense?
-    public WrapperCommand defaultDriveCommand() {
-        return drivetrain.applyRequest(() -> Constants.drivetrain.drive.withVelocityX(-joystick.getLeftY() * Constants.drivetrain.MaxSpeed) // Drive forward with
-                                                                                        // negative Y (forward)
-            .withVelocityY(-joystick.getLeftX() * Constants.drivetrain.MaxSpeed) // Drive left with negative X (left)
-            .withRotationalRate(-joystick.getRightX() * Constants.drivetrain.MaxAngularRate) // Drive counterclockwise with negative X (left)
-        ).ignoringDisable(true);
+    public void defaultDriveCommand() {
+        drivetrain.applyRequest(-joystick.getLeftY() ,-joystick.getLeftX(),-joystick.getRightX());
     }
     ////////////////////////////////////////////////////////
 

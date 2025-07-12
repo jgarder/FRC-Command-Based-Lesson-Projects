@@ -16,25 +16,17 @@ public class ComplexMechanismCommandFactory {
     // here we collect all the references to our subsystems that we will build all of our commands out of. 
     // we are also including our "static" method commands that just print becuase the printing is just a fill in for the subsystems you WOULD use in a real bot. 
     CommandXboxController joystick;
-    CommandSwerveDrivetrain drivetrain; 
+
     MyFirstSubsystem mFSS;
 
     //this is called complex but its a misnomer, its really just needs to be complex enough need its own class like this
-    public ComplexMechanismCommandFactory(CommandXboxController joystick,CommandSwerveDrivetrain drivetrain, MyFirstSubsystem mFSS) {
+    public ComplexMechanismCommandFactory(CommandXboxController joystick, MyFirstSubsystem mFSS) {
         this.joystick = joystick;
-        this.drivetrain = drivetrain;
+
         this.mFSS = mFSS;
     }
 
-    /////////////////DRIVETRAIN PARTS ////////////////////////
-    //this is used by the drivetrain and should maybe be moved to a place that makes more sense?
-    public WrapperCommand defaultDriveCommand() {
-        return drivetrain.applyRequest(() -> Constants.drivetrain.drive.withVelocityX(-joystick.getLeftY() * Constants.drivetrain.MaxSpeed) // Drive forward with
-                                                                                        // negative Y (forward)
-            .withVelocityY(-joystick.getLeftX() * Constants.drivetrain.MaxSpeed) // Drive left with negative X (left)
-            .withRotationalRate(-joystick.getRightX() * Constants.drivetrain.MaxAngularRate) // Drive counterclockwise with negative X (left)
-        ).ignoringDisable(true);
-    }
+
     ////////////////////////////////////////////////////////
 
     public SequentialCommandGroup sequenceOfPrints() {

@@ -39,16 +39,16 @@ public class RobotContainer {
     
     //this will bind the B button a to disable the periodic print. 
     //see how we can insert any code we want into the instant command? we are just wrapping our code with something the scheduler can run!
-    //joystick.b().whileTrue(new InstantCommand(()->{})); 
+    //joystick.b().whileTrue(new InstantCommand(()->{objectOfMyFirstClass.cmd_setPrintPeriodic(false)})); 
     
     //when pressing x it will run an instant command to set the print to true. when the x button goes false it will set the print to false!
-    joystick.x().onTrue(objectOfMyFirstClass.cmd_setPrintPeriodic(true)).onFalse(objectOfMyFirstClass.cmd_setPrintPeriodic(false));
+    joystick.x().onTrue(objectOfMyFirstClass.cmd_setPrintPeriodic(true));//.onFalse(objectOfMyFirstClass.cmd_setPrintPeriodic(false));
      
     //when pressing y is true this will Run and instant command using the factory Commands.runonce();
     // when Y is UNPRESSED it will automatically set the print to false aswell.
     //NOTICE HOW .onFalse is on a seperate line! since there is no ; then the statement keeps going!
-    joystick.y().onTrue(Commands.runOnce(()->{objectOfMyFirstClass.setPrintPeriodic(true);}, objectOfMyFirstClass))
-    .onFalse(new cmdSetPeriodicPrint(objectOfMyFirstClass, false));
+    joystick.y().onTrue(Commands.runOnce(()->{objectOfMyFirstClass.setPrintPeriodic(true);}, objectOfMyFirstClass));
+    //.onFalse(new cmdSetPeriodicPrint(objectOfMyFirstClass, false));
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     //joystick.pov(0).whileTrue();

@@ -10,11 +10,6 @@
 
 package frc.robot;
 
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
-
-import frc.robot.generated.TunerConstants;
-import frc.robot.Telemetry;
 
 public class Constants {
 
@@ -34,18 +29,6 @@ public class Constants {
             public static final String LimelightFrontName = "limelight-front";
     }
 
-    public static class drivetrain{
-
-        public static final double MaxSpeed = TunerConstants.kSpeedAt12VoltsMps; // kSpeedAt12VoltsMps desired top speed
-        public static final double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
-
-         //this is used by the drivetrain and should maybe be moved to a place that makes more sense?
-         public static final  SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // I want field-centric
-
-
-        public static final  Telemetry logger = new Telemetry(MaxSpeed);       
-        }
+    
     
 }

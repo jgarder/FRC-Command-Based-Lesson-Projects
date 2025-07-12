@@ -41,7 +41,7 @@ public class RobotContainer {
   
   //THIS is our constructor method when our robot container is created/instantiated! it runs once.
   public RobotContainer() {
-    cmdFactory = new ComplexMechanismCommandFactory(joystick,null,mFSS);
+    cmdFactory = new ComplexMechanismCommandFactory(joystick,mFSS);
     configureBindings();
     SetupDashboard();
 
