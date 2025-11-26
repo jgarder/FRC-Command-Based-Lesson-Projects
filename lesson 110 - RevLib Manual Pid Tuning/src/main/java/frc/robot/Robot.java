@@ -13,13 +13,10 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import java.util.Arrays;
-import org.littletonrobotics.junction.AutoLogOutput;
+// import edu.wpi.first.epilogue.Epilogue;
+// import edu.wpi.first.epilogue.logging.errors.ErrorHandler;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.RevLibExamples.RevClosedLoop;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -34,7 +31,63 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  * project.
  */
 public class Robot extends LoggedRobot {
+  private final int testRevLibMotorID = 1;
+  public RevClosedLoop OurRevLibClosedLoopExample = new RevClosedLoop(testRevLibMotorID);
+
   public Robot() {
+    BootupAdvantageKit();
+    // BootupWpilibEpilogueLogger();
+  }
+
+  /*
+   * https://github.com/wpilibsuite/allwpilib/issues/7103
+   * to run ./gradlew simulateJava directly through a terminal,
+   * instead of using the Simulate Robot Program task in vscode.
+   *  The vscode debugger extension loads the Eclipse-generated classes,
+   *  not the gradle-built ones, so running the gradle task directly will load the correct classes.
+   * You would need to manually attach the debugger to the gradle task,
+   * but may behave oddly due to a mismatch between the JLS and gradle generated sources.
+   * Intellisense for the generated classes will also get gradually
+   * get more and more out of sync with your project,
+   * but unless you're doing really custom things with Epilogue,
+   * it should be fine since all you need are the Epilogue class and its bind and update methods
+   */
+  // UPDATE FIXED USING changes to build.gradle --->>
+  // https://github.com/wpilibsuite/vscode-wpilib/pull/717
+  // private void BootupWpilibEpilogueLogger() {
+  //   enableLiveWindowInTest(true);
+  //   DataLogManager.logNetworkTables(true);
+  //   DataLogManager.logConsoleOutput(true);
+  //   DataLogManager.log("Lesson110 - 2025 8608 Frc Java Lessons");
+  //   DataLogManager.start();
+  //   Epilogue.configure(
+  //       config -> {
+  //         // Log only to disk, instead of the default NetworkTables logging
+  //         // Note that this means data cannot be analyzed in realtime by a dashboard
+  //         // config.backend = new FileBackend(DataLogManager.getLog());
+
+  //         if (isSimulation()) {
+  //           // If running in simulation, then we'd want to re-throw any errors that
+  //           // occur so we can debug and fix them!
+  //           config.errorHandler = ErrorHandler.crashOnError();
+  //         }
+
+  //         // Change the root data path
+  //         config.root = "AlphaBotsTelemetry";
+
+  //         // Only log critical information instead of the default DEBUG level.
+  //         // This can be helpful in a pinch to reduce network bandwidth or log file size
+  //         // while still logging important information.
+  //         // config.minimumImportance = Logged.Importance.CRITICAL;
+  //       });
+  //   Epilogue.bind(this);
+
+  //   Epilogue.getConfig().backend.lazy().log("IsCommandDashBoardSetup", false);
+  //   SetupDashboard();
+  //   Epilogue.getConfig().backend.lazy().log("IsCommandDashBoardSetup", true);
+  // }
+
+  private void BootupAdvantageKit() {
     // Record metadata
     Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
     Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
@@ -79,17 +132,15 @@ public class Robot extends LoggedRobot {
     Logger.start();
   }
 
-  @AutoLogOutput(key = "MyCustomStuff/PeriodicNumbers")
-  int PeriodicCounter = 0;
-
-  double AnotherPeriodicCounter = 0.0;
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
-    PeriodicCounter++;
-    AnotherPeriodicCounter += .1;
-    Logger.recordOutput(
-        "CustomFolderNamedWhatever/AnotherVariableImTracking", AnotherPeriodicCounter);
+    // Runs the Scheduler. This is responsible for polling buttons, adding
+    // newly-scheduled commands, running already-scheduled commands, removing
+    // finished or interrupted commands, and running subsystem periodic() methods.
+    // This must be called from the robot's periodic block in order for anything in
+    // the Command-based framework to work.
+    CommandScheduler.getInstance().run();
   }
 
   /** This function is called once when the robot is disabled. */
@@ -112,48 +163,8 @@ public class Robot extends LoggedRobot {
   @Override
   public void teleopInit() {}
 
-  /** This function is called periodically during operator control. */
-  public Translation2d[] arrayOfTranslations =
-      new Translation2d[] {
-        new Translation2d(1, 2),
-        new Translation2d(1, 4),
-        new Translation2d(5, 1),
-        new Translation2d(3.5, 8),
-        new Translation2d(1, 6.5)
-      };
-
-  public Translation2d gamePiecePose = new Translation2d(12, 14);
-  public Pose2d robotPose = new Pose2d(3.4, 4.5, Rotation2d.fromDegrees(45));
-  public Field2d field = new Field2d();
-
   @Override
-  public void teleopPeriodic() {
-    Logger.recordOutput("PiecesFolder/FakeRobotPos", robotPose);
-    field.setRobotPose(robotPose);
-    // String[] stringarray = new String[arrayOfTranslations.length];
-    Pose2d[] Pose2dArray = new Pose2d[arrayOfTranslations.length];
-    for (int i = 0; i < arrayOfTranslations.length; i++) {
-      // stringarray[i] = arrayOfTranslations[i].toString();
-      Pose2dArray[i] =
-          new Pose2d(
-              arrayOfTranslations[i].getX(),
-              arrayOfTranslations[i].getY(),
-              arrayOfTranslations[i].getAngle());
-    }
-    for (Translation2d translation2dArrayItem : arrayOfTranslations) {
-      System.out.println(translation2dArrayItem.toString());
-      Logger.recordOutput("PiecesFolder/StringConsole", translation2dArrayItem.toString());
-    }
-
-    // System.out.println(stringarray.toString());
-    // Logger.recordOutput("PiecesFolder/stringarray", stringarray);
-    Logger.recordOutput("PiecesFolder/Translation2dArray", arrayOfTranslations);
-    Logger.recordOutput("PiecesFolder/Pose2dArray", Pose2dArray);
-    field.getObject("GamePieces").setPoses(Arrays.asList(Pose2dArray));
-
-    SmartDashboard.putData(
-        "PiecesFolder/Field2d", field); // //Logger.recordOutput("PiecesFolder/Field2d", field);
-  }
+  public void teleopPeriodic() {}
 
   /** This function is called once when test mode is enabled. */
   @Override

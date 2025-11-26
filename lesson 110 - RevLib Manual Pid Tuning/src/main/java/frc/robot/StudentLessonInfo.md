@@ -22,7 +22,7 @@
  *
  * requirements to pass this lesson:
  *
- * Task 0 : run advantagescope, import the layout from the project folder, then Run the code (and switch to teleoperated) in the simulator and observe the results. connect advantage scope to the simulator. there should be some whole number (int) variables that are incrementing, you should be able to see these variables changing in the dashboard, and the sim GUI, and in advantagescope.
+ * Task 0 : run advantagescope, import the layout from the project folder, then Run the code in the simulator and observe the results. connect advantage scope to the simulator. there should be some whole number (int) variables that are incrementing, you should be able to see these variables changing in the dashboard, and the sim GUI, and in advantagescope.
  *
  * Task 1 (viewed by Mentor):
  * make a int variable and then log it using annotation logging (see the link above)

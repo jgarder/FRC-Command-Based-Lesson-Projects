@@ -34,6 +34,20 @@ public class Robot extends TimedRobot {
   private RobotContainer m_robotContainer;
 
   private Boolean isTeleopInit = false;
+
+    /*
+   * https://github.com/wpilibsuite/allwpilib/issues/7103
+   * to run ./gradlew simulateJava directly through a terminal, 
+   * instead of using the Simulate Robot Program task in vscode.
+   *  The vscode debugger extension loads the Eclipse-generated classes,
+   *  not the gradle-built ones, so running the gradle task directly will load the correct classes. 
+   * You would need to manually attach the debugger to the gradle task, 
+   * but may behave oddly due to a mismatch between the JLS and gradle generated sources. 
+   * Intellisense for the generated classes will also get gradually 
+   * get more and more out of sync with your project, 
+   * but unless you're doing really custom things with Epilogue, 
+   * it should be fine since all you need are the Epilogue class and its bind and update methods
+   */
   public Robot() {
     enableLiveWindowInTest(true);
     DataLogManager.logNetworkTables(true);
