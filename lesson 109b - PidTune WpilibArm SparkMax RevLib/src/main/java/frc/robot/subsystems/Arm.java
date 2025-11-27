@@ -58,6 +58,12 @@ public class Arm implements AutoCloseable {
   // then you may need to invert the motor direction
   private boolean MotorInverted = false;
 
+  //public static final double kArmReduction = 200;
+  public static final double kArmMass = Units.lbsToKilograms(17.637); // Kilograms
+  public static final double kArmLength = Units.inchesToMeters(30);
+  public static final double kMinAngleRads = Units.degreesToRadians(-75);
+  public static final double kMaxAngleRads = Units.degreesToRadians(255);
+
   // Simulation classes help us simulate what's going on, including gravity.
   // This arm sim represents an arm that can travel from -75 degrees (rotated down front)
   // to 255 degrees (rotated down in the back).
@@ -65,10 +71,10 @@ public class Arm implements AutoCloseable {
       new SingleJointedArmSim(
           m_armGearbox,
           gearboxReduction,
-          SingleJointedArmSim.estimateMOI(Constants.kArmLength, Constants.kArmMass),
-          Constants.kArmLength,
-          Constants.kMinAngleRads,
-          Constants.kMaxAngleRads,
+          SingleJointedArmSim.estimateMOI(kArmLength, kArmMass),
+          kArmLength,
+          kMinAngleRads,
+          kMaxAngleRads,
           true,
           0,
           Constants.kArmEncoderDistPerPulse,
@@ -138,6 +144,20 @@ public class Arm implements AutoCloseable {
     SmartDashboard.putNumber(className + " Gearbox Amps", m_armSim.getCurrentDrawAmps());
   }
 
+  public void setPosition(double rotations) {
+    SmartDashboard.putNumber(className + " Setpoint", rotations);
+    SparkMaxBuiltInPidController.setReference(rotations, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+  }
+
+  public double getPosition() {
+    return m_motor.getEncoder().getPosition();
+  }
+
+  //disabled motors output entirely. Arm will go limp. heat will stop. but encoder will still work.
+  public void stop() {
+    SparkMaxBuiltInPidController.setReference(0.0, ControlType.kDutyCycle); // set motor output to 0% by overriding any control mode like pid and going to duty cycle mode
+  }
+
   public void pidtune() {
     // get the latest user written values from the dashboard for the PID values.
     // these are local and are created/destroyed each time this function is called
@@ -161,20 +181,6 @@ public class Arm implements AutoCloseable {
       motorConfig.closedLoop.d(d, ClosedLoopSlot.kSlot0);
       m_motor.configureAsync(motorConfig,ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
-  }
-
-  public void setPosition(double rotations) {
-    SmartDashboard.putNumber(className + " Setpoint", rotations);
-    SparkMaxBuiltInPidController.setReference(rotations, ControlType.kPosition, ClosedLoopSlot.kSlot0);
-  }
-
-  public double getPosition() {
-    return m_motor.getEncoder().getPosition();
-  }
-
-  //disabled motors output entirely. Arm will go limp. heat will stop. but encoder will still work.
-  public void stop() {
-    SparkMaxBuiltInPidController.setReference(0.0, ControlType.kDutyCycle); // set motor output to 0% by overriding any control mode like pid and going to duty cycle mode
   }
 
   @Override
