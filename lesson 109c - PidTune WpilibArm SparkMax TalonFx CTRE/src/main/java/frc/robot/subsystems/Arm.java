@@ -4,18 +4,15 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.sim.SparkFlexSim;
-import com.revrobotics.sim.SparkMaxSim;
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
-import com.revrobotics.spark.config.SparkFlexConfig;
-import com.revrobotics.spark.config.SparkMaxConfig;
+import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.CoastOut;
+import com.ctre.phoenix6.controls.ControlRequest;
+import com.ctre.phoenix6.controls.PositionDutyCycle;
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -31,34 +28,33 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 
+/*
+ * THIS IS CURRENTLY BROKEN THE CALCULATIONS ARE WRONG IN THE SIM. its 95% complete but needs some fixes.
+ */
 public class Arm implements AutoCloseable {
   //name of this subsystem for dashboard labeling
   String className = this.getClass().getSimpleName();
   //default pids to be tuned from dashboard
-  private double PGain = 5.1;
+  private double PGain = 1.0;
   private double IGain = 0.0;
   private double DGain = 0.0;
   private double MaxAccel = 0.0;
   private double MaxVelocity = 0.0;
 
   // The arm gearbox represents a gearbox containing a single neo vortex.
-  private final DCMotor m_armGearbox = DCMotor.getNeoVortex(2);
+  private final DCMotor m_armGearbox = DCMotor.getKrakenX60Foc(1);
   private double gearboxReduction = 25;
 
+
   // Standard classes for controlling our arm
-  // IF USING SPARK FLEX: uncomment the following lines and comment the SPARK MAX lines
-  private final SparkFlex m_motor = new SparkFlex(Constants.kMotorPort, SparkMax.MotorType.kBrushless);
-  private final SparkFlexSim m_Simmotor = new SparkFlexSim(m_motor, m_armGearbox);
-  private SparkFlexConfig motorConfig = new SparkFlexConfig();
- 
-  //IF USING SPARK MAX INSTEAD OF SPARK FLEX, UNCOMMENT THE FOLLOWING LINES AND COMMENT THE ABOVE LINES
-  // private final SparkMax m_motor = new SparkMax(Constants.kMotorPort, SparkMax.MotorType.kBrushless);
-  // private final SparkMaxSim m_Simmotor = new SparkMaxSim(m_motor, m_armGearbox);
-  // private SparkMaxConfig motorConfig = new SparkMaxConfig();
+  private final TalonFX m_motor = new TalonFX(Constants.kMotorPort);
+  private final TalonFXSimState m_Simmotor = m_motor.getSimState();
+  private TalonFXConfiguration motorConfig = new TalonFXConfiguration();
+  //control Request are used to set the type of control being used on the motor via the talonfx 
+  private ControlRequest positionControlType = new TorqueCurrentFOC(0); //any Direct Known Subclasses found at : https://api.ctr-electronics.com/phoenix6/release/java/com/ctre/phoenix6/controls/ControlRequest.html
 
   //the built in PID controller on the Spark(Max Or Flex) motor controller, these will not take processing power from the roborio because they are running on the motor controller itself at a much higher loop rate (this is good for fast response and precision)
-  private SparkClosedLoopController SparkMaxBuiltInPidController = m_motor.getClosedLoopController();
-  private ControlType positionControlType = ControlType.kMAXMotionPositionControl; //Postion Types : kPosition for simple PID control, kMAXMotionPositionControl for a profiled PID
+  
   // these positions are for the Soft limits. these are used by the motor controller to attempt to
   // control the movement range of the motor
   // These are often found by cold booting the mechanism to a known location (like a hard stop) and
@@ -131,20 +127,47 @@ public class Arm implements AutoCloseable {
   /** Update the simulation model. */
   public void simulationPeriodic() {
     
+    
+ 
+
+    /* Pass the robot battery voltage to the simulated devices */
+    m_Simmotor.setSupplyVoltage(RobotController.getBatteryVoltage());
+    
     // In this method, we update our simulation of what our arm is doing
     // First, we set our "inputs" (voltages)
-    m_armSim.setInput(m_Simmotor.getAppliedOutput() * RobotController.getBatteryVoltage());
+    /*
+    * CTRE simulation is low-level, so SimState inputs
+    * and outputs are not affected by user-level inversion.
+    * However, inputs and outputs *are* affected by the mechanical
+    * orientation of the device relative to the robot chassis,
+    * as specified by the `orientation` field.
+    *
+    * WPILib expects +V to be forward. We have already configured
+    * our orientations to match this behavior.
+    */
+    m_armSim.setInput(
+      m_Simmotor.getMotorVoltage()
+    );
 
-    // Next, we update it. The standard loop time is 20ms.
-    m_armSim.update(0.020);
+    /*
+      * Advance the model by 20 ms. Note that if you are running this
+      * subsystem in a separate thread or have changed the nominal
+      * timestep of TimedRobot, this value needs to match it.
+      */
+      // Next, we update it. The standard loop time is 20ms.
+      m_armSim.update(0.020);
 
-    // Update the Mechanism 2d arm angle
-     // Now, we update the Spark Flex
-     m_Simmotor.iterate(
-      Units.radiansPerSecondToRotationsPerMinute( // motor velocity, in RPM
-          m_armSim.getVelocityRadPerSec()),
-      RoboRioSim.getVInVoltage(), // Simulated battery voltage, in Volts
-      0.02); // Time interval, in Seconds
+    /* Update all of our sensors. */
+    final var leftPos = m_armSim.getAngleRads();
+    // This is OK, since the time base is the same
+    final var leftVel = Units.radiansPerSecondToRotationsPerMinute( // motor velocity, in RPM
+    m_armSim.getVelocityRadPerSec());
+    /*
+     * update sim motor positions and velocities based on the mechanism
+     */
+
+    m_Simmotor.setRawRotorPosition(leftPos / (2.0 * Math.PI) * gearboxReduction);// convert radians to rotations and account for gearbox
+    m_Simmotor.setRotorVelocity(leftVel * gearboxReduction); // convert to motor RPM and account for gearbox
 
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(
@@ -155,22 +178,22 @@ public class Arm implements AutoCloseable {
     pidtune();
 
     SmartDashboard.putNumber(className + " Motor Rotations", getPosition());
-    SmartDashboard.putNumber(className + " Motor Amps", m_Simmotor.getMotorCurrent());
+    SmartDashboard.putNumber(className + " Motor Amps", m_Simmotor.getTorqueCurrent());
     SmartDashboard.putNumber(className + " Gearbox Amps", m_armSim.getCurrentDrawAmps());
   }
 
   public void setPosition(double rotations) {
     SmartDashboard.putNumber(className + " Setpoint", rotations);
-    SparkMaxBuiltInPidController.setReference(rotations, positionControlType, ClosedLoopSlot.kSlot0);
+    m_motor.setControl(new PositionDutyCycle(rotations));
   }
 
   public double getPosition() {
-    return m_motor.getEncoder().getPosition();
+    return m_motor.getPosition().getValueAsDouble();
   }
 
   //disabled motors output entirely. Arm will go limp. heat will stop. but encoder will still work.
   public void stop() {
-    SparkMaxBuiltInPidController.setReference(0.0, ControlType.kDutyCycle); // set motor output to 0% by overriding any control mode like pid and going to duty cycle mode
+    m_motor.setControl(new CoastOut()); // set motor output to 0% by overriding any control mode like pid and going to duty cycle mode
   }
 
   public void pidtune() {
@@ -184,28 +207,28 @@ public class Arm implements AutoCloseable {
     // if the value has changed, update the local variable AND controller with the new value.
     if ((p != PGain)) {
       PGain = p;
-      motorConfig.closedLoop.p(p, ClosedLoopSlot.kSlot0);
-      m_motor.configureAsync(motorConfig,ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+      motorConfig.Slot0.kP = PGain;
+      m_motor.getConfigurator().apply(motorConfig);
     }
     if ((i != IGain)) {
       IGain = i;
-      motorConfig.closedLoop.i(i, ClosedLoopSlot.kSlot0);
-      m_motor.configureAsync(motorConfig,ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+      motorConfig.Slot0.kI = IGain;
+      m_motor.getConfigurator().apply(motorConfig);
     }
     if ((d != DGain)) {
       DGain = d;
-      motorConfig.closedLoop.d(d, ClosedLoopSlot.kSlot0);
-      m_motor.configureAsync(motorConfig,ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+      motorConfig.Slot0.kD = DGain;
+      m_motor.getConfigurator().apply(motorConfig);
     }
     if ((A != MaxAccel)) {
       MaxAccel = A;
-      motorConfig.closedLoop.maxMotion.maxAcceleration(A, ClosedLoopSlot.kSlot0);
-      m_motor.configureAsync(motorConfig,ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+      motorConfig.MotionMagic.MotionMagicAcceleration = MaxAccel;
+      m_motor.getConfigurator().apply(motorConfig);
     }
     if ((V != MaxVelocity)) {
       MaxVelocity = V;
-      motorConfig.closedLoop.maxMotion.maxVelocity(V, ClosedLoopSlot.kSlot0);
-      m_motor.configureAsync(motorConfig,ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+      motorConfig.MotionMagic.MotionMagicCruiseVelocity = MaxVelocity;
+      m_motor.getConfigurator().apply(motorConfig);
     }
   }
 
@@ -219,51 +242,25 @@ public class Arm implements AutoCloseable {
 
   // Configure the motor controller
   private void SetupMotorConfig() {
-    /*
-     * Create a new SPARK MAX configuration object. This will store the
-     * configuration parameters for the SPARK MAX that we will set below.
-     */
-    //motorConfig = new SparkMaxConfig();
-    /*
-     * Configure soft limits. These limits will prevent the motor from moving
-     * beyond the specified positions.
-     */
-    motorConfig.softLimit.forwardSoftLimit(MaxPostition).reverseSoftLimit(MinPostiion);
+    // set motor inversion
+    motorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
-    // Invert Motor Direction (if needed)
-    motorConfig.inverted(MotorInverted);
-    /*
-     * Configure the encoder. For this specific example, we are using the
-     * integrated encoder of the NEO, and we don't need to configure it. If
-     * needed, we can adjust values like the position or velocity conversion
-     * factors.
-     */
-    motorConfig.encoder.positionConversionFactor(1).velocityConversionFactor(1);
+    // set soft limits
+    motorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+    motorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    motorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = MaxPostition;
+    motorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = MinPostiion;
 
-    /*
-     * Configure the closed loop controller. We want to make sure we set the
-     * feedback sensor as the primary encoder.
-     */
-    motorConfig
-        .closedLoop
-        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        // Set PID values for position control. We don't need to pass a closed loop
-        // slot, as it will default to slot 0.
-        .p(PGain)
-        .i(IGain)
-        .d(DGain)
-        .outputRange(-1, 1);
+    // set pid values
+    motorConfig.Slot0.kP = PGain;
+    motorConfig.Slot0.kI = IGain;
+    motorConfig.Slot0.kD = DGain;
 
-    /*
-     * Apply the configuration to the SPARK MAX.
-     *
-     * kResetSafeParameters is used to get the SPARK MAX to a known state. This
-     * is useful in case the SPARK MAX is replaced.
-     *
-     * kPersistParameters is used to ensure the configuration is not lost when
-     * the SPARK MAX loses power. This is useful for power cycles that may occur
-     * mid-operation.
-     */
-    m_motor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    // set motion magic values
+    motorConfig.MotionMagic.MotionMagicAcceleration = MaxAccel;
+    motorConfig.MotionMagic.MotionMagicCruiseVelocity = MaxVelocity;
+
+    // apply the configuration to the motor
+    m_motor.getConfigurator().apply(motorConfig);
   }
 }
