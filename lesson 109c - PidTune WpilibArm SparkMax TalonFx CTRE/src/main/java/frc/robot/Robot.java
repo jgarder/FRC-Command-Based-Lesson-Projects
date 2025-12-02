@@ -24,9 +24,10 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {}
 
-  public final double kArmSetpoint = 0.35;
-  public final double kArmSetpoint2 = 0.55;
-  public final double kArmParkPoint = -0.15;
+  public final double kArmSetpoint = 90;
+  public final double kArmSetpoint2 = 45;
+  public final double kArmSetpoint3 = -90;
+  public final double kArmParkPoint = 0;
 
   @Override
   public void teleopPeriodic() {
@@ -38,13 +39,18 @@ public class Robot extends TimedRobot {
       // Here, we run PID control like normal.
       m_arm.setPosition(kArmSetpoint2);
     } 
+    else if (m_joystick.getXButton()) {
+      // Here, we run PID control like normal.
+      m_arm.setPosition(kArmSetpoint3);
+    } 
     else if (m_joystick.getYButton()) {
       // Here, we run duty cycle control and shutdown the pidloop
-      m_arm.stop();
+     
+       // Otherwise, we disable the motor.
+       m_arm.setPosition(kArmParkPoint);
     } 
-    else {
-      // Otherwise, we disable the motor.
-      m_arm.setPosition(kArmParkPoint);
+    else if (m_joystick.getRightBumperButton()) {
+      m_arm.stop();
     }
   }
 

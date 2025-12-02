@@ -12,6 +12,7 @@ import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -35,7 +36,7 @@ public class Arm implements AutoCloseable {
   //name of this subsystem for dashboard labeling
   String className = this.getClass().getSimpleName();
   //default pids to be tuned from dashboard
-  private double PGain = 1.0;
+  private double PGain = .1;
   private double IGain = 0.0;
   private double DGain = 0.0;
   private double MaxAccel = 0.0;
@@ -55,13 +56,7 @@ public class Arm implements AutoCloseable {
 
   //the built in PID controller on the Spark(Max Or Flex) motor controller, these will not take processing power from the roborio because they are running on the motor controller itself at a much higher loop rate (this is good for fast response and precision)
   
-  // these positions are for the Soft limits. these are used by the motor controller to attempt to
-  // control the movement range of the motor
-  // These are often found by cold booting the mechanism to a known location (like a hard stop) and
-  // setting that position as 0 (min position), then moving to the other end of travel and reading
-  // the position (maxposition).
-  private double MinPostiion = -0.1; // rotations
-  private double MaxPostition = .8; // rotations
+
 
   // if the position lowers while moving away from start position (which should be the min position)
   // then you may need to invert the motor direction
@@ -72,6 +67,15 @@ public class Arm implements AutoCloseable {
   public static final double kArmLength = Units.inchesToMeters(30);
   public static final double kMinAngleRads = Units.degreesToRadians(-75);
   public static final double kMaxAngleRads = Units.degreesToRadians(255);
+  public static final double startingAngle = Units.degreesToRadians(90); // starting angle of the arm in radians
+
+  // these positions are for the Soft limits. these are used by the motor controller to attempt to
+  // control the movement range of the motor
+  // These are often found by cold booting the mechanism to a known location (like a hard stop) and
+  // setting that position as 0 (min position), then moving to the other end of travel and reading
+  // the position (maxposition).
+  private double MinPostiion = Units.degreesToRotations(Units.radiansToDegrees(kMinAngleRads)) * gearboxReduction; // rotations
+  private double MaxPostition = Units.degreesToRotations(Units.radiansToDegrees(kMaxAngleRads)) * gearboxReduction; // rotations
 
   // Simulation classes help us simulate what's going on, including gravity.
   // This arm sim represents an arm that can travel from -75 degrees (rotated down front)
@@ -85,7 +89,7 @@ public class Arm implements AutoCloseable {
           kMinAngleRads,
           kMaxAngleRads,
           true,
-          0,
+          startingAngle,
           Constants.kArmEncoderDistPerPulse,
           0.0 // Add noise with a std-dev of 1 tick
           );
@@ -123,7 +127,7 @@ public class Arm implements AutoCloseable {
     SmartDashboard.setDefaultNumber(className + " Max Accel", MaxAccel);
     SmartDashboard.setDefaultNumber(className + " Max Velocity", MaxVelocity);
   }
-
+  
   /** Update the simulation model. */
   public void simulationPeriodic() {
     
@@ -157,17 +161,27 @@ public class Arm implements AutoCloseable {
       // Next, we update it. The standard loop time is 20ms.
       m_armSim.update(0.020);
 
-    /* Update all of our sensors. */
-    final var leftPos = m_armSim.getAngleRads();
-    // This is OK, since the time base is the same
-    final var leftVel = Units.radiansPerSecondToRotationsPerMinute( // motor velocity, in RPM
-    m_armSim.getVelocityRadPerSec());
-    /*
-     * update sim motor positions and velocities based on the mechanism
-     */
+    // /* Update all of our sensors. */
+    // final var leftPos = m_armSim.getAngleRads();
+    // // This is OK, since the time base is the same
+    // final var leftVel = Units.radiansPerSecondToRotationsPerMinute( // motor velocity, in RPM
+    // m_armSim.getVelocityRadPerSec());
+    // /*
+    //  * update sim motor positions and velocities based on the mechanism
+    //  */
 
-    m_Simmotor.setRawRotorPosition(leftPos / (2.0 * Math.PI) * gearboxReduction);// convert radians to rotations and account for gearbox
-    m_Simmotor.setRotorVelocity(leftVel * gearboxReduction); // convert to motor RPM and account for gearbox
+    // m_Simmotor.setRawRotorPosition(leftPos / (2.0 * Math.PI) * gearboxReduction);// convert radians to rotations and account for gearbox
+    // m_Simmotor.setRotorVelocity(leftVel * gearboxReduction); // convert to motor RPM and account for gearbox
+
+     // ------ Update motor based on sim
+    // Make sure to convert radians at the mechanism to rotations at the motor
+    // Subtracting out the starting angle is necessary so the simulation can't "cheat" and use the
+    // sim as an absolute encoder.
+    var rawRotorPos = Units.degreesToRotations(Units.radiansToDegrees(m_armSim.getAngleRads() - startingAngle))
+    * gearboxReduction;
+    m_Simmotor.setRawRotorPosition(rawRotorPos);
+    m_Simmotor.setRotorVelocity(
+            m_armSim.getVelocityRadPerSec() * gearboxReduction / (2.0 * Math.PI));
 
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(
@@ -175,16 +189,23 @@ public class Arm implements AutoCloseable {
 
     // Update the Mechanism Arm angle based on the simulated arm angle
     m_arm.setAngle(Units.radiansToDegrees(m_armSim.getAngleRads()));
+    
     pidtune();
 
     SmartDashboard.putNumber(className + " Motor Rotations", getPosition());
     SmartDashboard.putNumber(className + " Motor Amps", m_Simmotor.getTorqueCurrent());
     SmartDashboard.putNumber(className + " Gearbox Amps", m_armSim.getCurrentDrawAmps());
+    SmartDashboard.putNumber(className + " Arm Degrees", Units.radiansToDegrees(m_armSim.getAngleRads()));
+    SmartDashboard.putNumber(className + " Arm Radians", m_armSim.getAngleRads());
+    SmartDashboard.putNumber(className + " Arm RawRotorPos", rawRotorPos);
   }
 
-  public void setPosition(double rotations) {
-    SmartDashboard.putNumber(className + " Setpoint", rotations);
-    m_motor.setControl(new PositionDutyCycle(rotations));
+  public void setPosition(double degrees) {
+    
+    //convert radians to rotations for the motor controller before the gearbox
+    double rotationsBeforeGearbox =  Units.degreesToRotations(degrees) * gearboxReduction;
+    SmartDashboard.putNumber(className + " Setpoint", rotationsBeforeGearbox);
+    m_motor.setControl(new PositionDutyCycle(rotationsBeforeGearbox));
   }
 
   public double getPosition() {
@@ -243,8 +264,8 @@ public class Arm implements AutoCloseable {
   // Configure the motor controller
   private void SetupMotorConfig() {
     // set motor inversion
-    motorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-
+    //motorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    m_Simmotor.Orientation = ChassisReference.CounterClockwise_Positive;
     // set soft limits
     motorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
     motorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
