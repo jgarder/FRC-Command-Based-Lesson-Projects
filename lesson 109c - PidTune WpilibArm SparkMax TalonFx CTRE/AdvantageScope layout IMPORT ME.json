@@ -1,10 +1,10 @@
 {
   "hubs": [
     {
-      "x": 7,
-      "y": 288,
-      "width": 1673,
-      "height": 661,
+      "x": 40,
+      "y": 458,
+      "width": 1790,
+      "height": 797,
       "state": {
         "sidebar": {
           "width": 300,
@@ -12,11 +12,12 @@
             "/NT",
             "/NT/SmartDashboard",
             "/Commands",
-            "/SmartDashboard"
+            "/SmartDashboard",
+            "/SmartDashboard/Arm"
           ]
         },
         "tabs": {
-          "selected": 2,
+          "selected": 1,
           "tabs": [
             {
               "type": 0,
@@ -28,26 +29,26 @@
             },
             {
               "type": 1,
-              "title": "Motor Rotations",
+              "title": "Arm Degrees",
               "controller": {
                 "leftSources": [
                   {
                     "type": "stepped",
-                    "logKey": "NT:/SmartDashboard/Arm Setpoint",
+                    "logKey": "NT:/SmartDashboard/Arm/ Arm Degrees",
                     "logType": "Number",
                     "visible": true,
                     "options": {
-                      "color": "#e5b31b",
+                      "color": "#2b66a2",
                       "size": "normal"
                     }
                   },
                   {
                     "type": "stepped",
-                    "logKey": "NT:/SmartDashboard/Arm Motor Rotations",
+                    "logKey": "NT:/SmartDashboard/Arm/ Setpoint degrees",
                     "logType": "Number",
                     "visible": true,
                     "options": {
-                      "color": "#af2437",
+                      "color": "#e5b31b",
                       "size": "normal"
                     }
                   }
@@ -73,12 +74,57 @@
             },
             {
               "type": 1,
+              "title": "Motor Rotations",
+              "controller": {
+                "leftSources": [
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/SmartDashboard/Arm/ Setpoint MotorRotations",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#2b66a2",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/SmartDashboard/Arm/ Arm RawRotorPos",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#e5b31b",
+                      "size": "normal"
+                    }
+                  }
+                ],
+                "rightSources": [],
+                "discreteSources": [],
+                "leftLockedRange": null,
+                "rightLockedRange": null,
+                "leftUnitConversion": {
+                  "type": null,
+                  "factor": 1
+                },
+                "rightUnitConversion": {
+                  "type": null,
+                  "factor": 1
+                },
+                "leftFilter": 0,
+                "rightFilter": 0
+              },
+              "controllerUUID": "r8ftbg115d0pmdgt5bhbsssn8spgq9fr",
+              "renderer": null,
+              "controlsHeight": 200
+            },
+            {
+              "type": 1,
               "title": "Amps (HEAT)",
               "controller": {
                 "leftSources": [
                   {
                     "type": "stepped",
-                    "logKey": "NT:/SmartDashboard/Arm Gearbox Amps",
+                    "logKey": "NT:/SmartDashboard/Arm/ Gearbox Amps",
                     "logType": "Number",
                     "visible": true,
                     "options": {
@@ -129,19 +175,8 @@
   ],
   "satellites": [
     {
-      "x": 1688,
-      "y": 268,
-      "width": 654,
-      "height": 677,
-      "state": {
-        "type": 10,
-        "visualizer": null
-      },
-      "uuid": "tmpau3kodzl5cah5sx1vnem5npqwgo8r"
-    },
-    {
-      "x": 1466,
-      "y": 361,
+      "x": 1845,
+      "y": 372,
       "width": 654,
       "height": 677,
       "state": {

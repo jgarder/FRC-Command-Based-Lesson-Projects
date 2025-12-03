@@ -9,6 +9,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.CoastOut;
 import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
+import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -30,17 +31,38 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 
 /*
- * THIS IS CURRENTLY BROKEN THE CALCULATIONS ARE WRONG IN THE SIM. its 95% complete but needs some fixes.
+ * works great this is for testing CTRE talonFX positional control with the kraken motor and a single jointed arm sim
  */
 public class Arm implements AutoCloseable {
   //name of this subsystem for dashboard labeling
-  String className = this.getClass().getSimpleName();
+  String className = this.getClass().getSimpleName() + "/";
   //default pids to be tuned from dashboard
-  private double PGain = .1;
-  private double IGain = 0.0;
-  private double DGain = 0.0;
+  
+  private double PGain = .1;  //1kraken PTCFOC try 300 - 2kraken PTCFOC try 300 - 1kraken PDC try 1.000 - 2kraken PDC try 0.800
+  private double IGain = 0.0; //1kraken PTCFOC try 300 - 2kraken PTCFOC try 000 - 1kraken PDC try 0.000 - 2kraken PDC try 0.000
+  private double DGain = 0.0; //1kraken PTCFOC try 300 - 2kraken PTCFOC try 060 - 1kraken PDC try 0.190 - 2kraken PDC try 0.100
   private double MaxAccel = 0.0;
   private double MaxVelocity = 0.0;
+
+  public double currentSetpointdegrees = 0.0;
+  /*
+   * Method to set the arm position in degrees of absolute arm position
+   * Use any positional control request found here : https://api.ctr-electronics.com/phoenix6/release/java/com/ctre/phoenix6/controls/ControlRequest.html
+   */
+  public void setPosition(double degrees) {
+    degrees = clamp(degrees, kmindegrees - startingAngleDegrees, kmaxdegrees - startingAngleDegrees); // clamp the input to min/max degrees
+    currentSetpointdegrees = degrees;
+    //convert radians to rotations for the motor controller before the gearbox
+    double rotationsBeforeGearbox =  Units.degreesToRotations(degrees) * gearboxReduction;
+    SmartDashboard.putNumber(className + " Setpoint ArmRotations", Units.degreesToRotations(degrees));
+    SmartDashboard.putNumber(className + " Setpoint MotorRotations", rotationsBeforeGearbox);
+    SmartDashboard.putNumber(className + " Setpoint degrees", degrees + Units.radiansToDegrees(startingAngle));
+    
+    //UNCOMMENT ONE OF THE BELOW TO SELECT THE TYPE OF POSITION CONTROL YOU WANT TO USE
+    //m_motor.setControl(new PositionDutyCycle(rotationsBeforeGearbox));
+    m_motor.setControl(new PositionTorqueCurrentFOC(rotationsBeforeGearbox));
+    
+  }
 
   // The arm gearbox represents a gearbox containing a single neo vortex.
   private final DCMotor m_armGearbox = DCMotor.getKrakenX60Foc(1);
@@ -52,7 +74,6 @@ public class Arm implements AutoCloseable {
   private final TalonFXSimState m_Simmotor = m_motor.getSimState();
   private TalonFXConfiguration motorConfig = new TalonFXConfiguration();
   //control Request are used to set the type of control being used on the motor via the talonfx 
-  private ControlRequest positionControlType = new TorqueCurrentFOC(0); //any Direct Known Subclasses found at : https://api.ctr-electronics.com/phoenix6/release/java/com/ctre/phoenix6/controls/ControlRequest.html
 
   //the built in PID controller on the Spark(Max Or Flex) motor controller, these will not take processing power from the roborio because they are running on the motor controller itself at a much higher loop rate (this is good for fast response and precision)
   
@@ -65,17 +86,20 @@ public class Arm implements AutoCloseable {
   //public static final double kArmReduction = 200;
   public static final double kArmMass = Units.lbsToKilograms(17.637); // Kilograms
   public static final double kArmLength = Units.inchesToMeters(30);
-  public static final double kMinAngleRads = Units.degreesToRadians(-75);
-  public static final double kMaxAngleRads = Units.degreesToRadians(255);
-  public static final double startingAngle = Units.degreesToRadians(90); // starting angle of the arm in radians
+  public static final double kmindegrees = -75; // minimum angle of the arm in degrees
+  public static final double kmaxdegrees = 255; // maximum angle of the arm in degrees
+  public static final double startingAngleDegrees = 90; // starting angle of the arm in degrees
+  public static final double kMinAngleRads = Units.degreesToRadians(kmindegrees);
+  public static final double kMaxAngleRads = Units.degreesToRadians(kmaxdegrees);
+  public static final double startingAngle = Units.degreesToRadians(startingAngleDegrees); // starting angle of the arm in radians
 
-  // these positions are for the Soft limits. these are used by the motor controller to attempt to
+  // these Raw rotor positions are for the Soft limits. these are used by the motor controller to attempt to
   // control the movement range of the motor
   // These are often found by cold booting the mechanism to a known location (like a hard stop) and
   // setting that position as 0 (min position), then moving to the other end of travel and reading
   // the position (maxposition).
-  private double MinPostiion = Units.degreesToRotations(Units.radiansToDegrees(kMinAngleRads)) * gearboxReduction; // rotations
-  private double MaxPostition = Units.degreesToRotations(Units.radiansToDegrees(kMaxAngleRads)) * gearboxReduction; // rotations
+  private double MinPostiion = Units.degreesToRotations(-75 - startingAngleDegrees) * gearboxReduction; // rotations
+  private double MaxPostition = Units.degreesToRotations(255 - startingAngleDegrees) * gearboxReduction; // rotations
 
   // Simulation classes help us simulate what's going on, including gravity.
   // This arm sim represents an arm that can travel from -75 degrees (rotated down front)
@@ -180,8 +204,7 @@ public class Arm implements AutoCloseable {
     var rawRotorPos = Units.degreesToRotations(Units.radiansToDegrees(m_armSim.getAngleRads() - startingAngle))
     * gearboxReduction;
     m_Simmotor.setRawRotorPosition(rawRotorPos);
-    m_Simmotor.setRotorVelocity(
-            m_armSim.getVelocityRadPerSec() * gearboxReduction / (2.0 * Math.PI));
+    m_Simmotor.setRotorVelocity(Units.radiansToRotations(m_armSim.getVelocityRadPerSec())  * gearboxReduction);
 
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(
@@ -200,13 +223,10 @@ public class Arm implements AutoCloseable {
     SmartDashboard.putNumber(className + " Arm RawRotorPos", rawRotorPos);
   }
 
-  public void setPosition(double degrees) {
-    
-    //convert radians to rotations for the motor controller before the gearbox
-    double rotationsBeforeGearbox =  Units.degreesToRotations(degrees) * gearboxReduction;
-    SmartDashboard.putNumber(className + " Setpoint", rotationsBeforeGearbox);
-    m_motor.setControl(new PositionDutyCycle(rotationsBeforeGearbox));
-  }
+
+  public static double clamp(double value, double min, double max) {
+    return Math.max(min, Math.min(max, value));
+}
 
   public double getPosition() {
     return m_motor.getPosition().getValueAsDouble();
