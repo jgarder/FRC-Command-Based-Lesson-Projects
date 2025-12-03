@@ -2,12 +2,12 @@
 /*
  * FRC #8608 "a dummies guide to programming FRC java"
  *
- * this guide is just a rewriting of the 100% awesome WPILIB docs!
- * please just read the zero to robot section and you wont even need a mentor!
  * in this lesson we will also be using the barebone skeleton advantage kit for a logging demonstration.
+ * This lesson also has some custom structures in periodic for sending positions or field elements to the elastic dashboard OR advantagescope
+ * to use the custom elements import the layouts in the project folder to advantageSCOPE and the elastic dashboard (2025 robo rio versions)
  *
  * Advantage Kit Version used : v4.1.2 (for Robo Rio)
- * 
+ *
  * references when in trouble (READ THE ADVANTAGE KIT WEBSITE):
  * -> https://docs.advantagekit.org/
  * -> https://docs.advantagekit.org/data-flow/recording-outputs/
@@ -22,7 +22,7 @@
  *
  * requirements to pass this lesson:
  *
- * Task 0 : Run the code in the simulator and observe the results. there should be some whole number (int) variables that are incrementing, you should be able to see these variables changing in the dashboard, or the sim GUI, or in advantagescope.
+ * Task 0 : run advantagescope, import the layout from the project folder, then Run the code (and switch to teleoperated) in the simulator and observe the results. connect advantage scope to the simulator. there should be some whole number (int) variables that are incrementing, you should be able to see these variables changing in the dashboard, and the sim GUI, and in advantagescope.
  *
  * Task 1 (viewed by Mentor):
  * make a int variable and then log it using annotation logging (see the link above)

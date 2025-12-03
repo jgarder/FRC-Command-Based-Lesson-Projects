@@ -13,6 +13,12 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import java.util.Arrays;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -107,8 +113,47 @@ public class Robot extends LoggedRobot {
   public void teleopInit() {}
 
   /** This function is called periodically during operator control. */
+  public Translation2d[] arrayOfTranslations =
+      new Translation2d[] {
+        new Translation2d(1, 2),
+        new Translation2d(1, 4),
+        new Translation2d(5, 1),
+        new Translation2d(3.5, 8),
+        new Translation2d(1, 6.5)
+      };
+
+  public Translation2d gamePiecePose = new Translation2d(12, 14);
+  public Pose2d robotPose = new Pose2d(3.4, 4.5, Rotation2d.fromDegrees(45));
+  public Field2d field = new Field2d();
+
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    Logger.recordOutput("PiecesFolder/FakeRobotPos", robotPose);
+    field.setRobotPose(robotPose);
+    // String[] stringarray = new String[arrayOfTranslations.length];
+    Pose2d[] Pose2dArray = new Pose2d[arrayOfTranslations.length];
+    for (int i = 0; i < arrayOfTranslations.length; i++) {
+      // stringarray[i] = arrayOfTranslations[i].toString();
+      Pose2dArray[i] =
+          new Pose2d(
+              arrayOfTranslations[i].getX(),
+              arrayOfTranslations[i].getY(),
+              arrayOfTranslations[i].getAngle());
+    }
+    for (Translation2d translation2dArrayItem : arrayOfTranslations) {
+      System.out.println(translation2dArrayItem.toString());
+      Logger.recordOutput("PiecesFolder/StringConsole", translation2dArrayItem.toString());
+    }
+
+    // System.out.println(stringarray.toString());
+    // Logger.recordOutput("PiecesFolder/stringarray", stringarray);
+    Logger.recordOutput("PiecesFolder/Translation2dArray", arrayOfTranslations);
+    Logger.recordOutput("PiecesFolder/Pose2dArray", Pose2dArray);
+    field.getObject("GamePieces").setPoses(Arrays.asList(Pose2dArray));
+
+    SmartDashboard.putData(
+        "PiecesFolder/Field2d", field); // //Logger.recordOutput("PiecesFolder/Field2d", field);
+  }
 
   /** This function is called once when test mode is enabled. */
   @Override
